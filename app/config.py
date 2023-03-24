@@ -7,7 +7,7 @@ class Config:
     USE_TOKEN_AUTH = False
     USE_RATE_LIMITS = False
     #SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
-    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:1234@localhost:5432/lovelace'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:1234@localhost:5432/devdb'
 
 
 class DevelopmentConfig(Config):
@@ -28,6 +28,5 @@ config = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
     'production': ProductionConfig,
-
     'default': DevelopmentConfig
 }
