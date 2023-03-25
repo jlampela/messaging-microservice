@@ -1,9 +1,8 @@
 from uuid import uuid4
-from utils.errors import ServiceErrors
-from models.messages import Messages
+from models.messages import MessageModel
 from sqlalchemy import and_
 from sqlalchemy.exc import IntegrityError, NoResultFound
-from app import db
+from db import db
 
 
 class ChatModel(db.Model):
@@ -11,7 +10,7 @@ class ChatModel(db.Model):
     ChatModel class for creating 'chatModel' table in the database
     which includes the all the chatModel.
     """
-    __tablename__ = 'chatModel'
+    __tablename__ = 'chats'
 
     id = db.Column(db.Integer, primary_key=True, unique=True)
     chat_id = db.Column(db.String(80), unique=True)
@@ -19,7 +18,7 @@ class ChatModel(db.Model):
     sender2_id = db.Column(db.String(80), nullable=False)
     topic = db.Column(db.String(80), nullable=False)
     course_space = db.Column(db.String(80))
-    messages = db.relationship('Messages', backref='chatModel', lazy='dynamic', order_by='Messages.timestamp')
+    messages = db.relationship('MessageModel', backref='chats', lazy='dynamic', order_by='MessageModel.timestamp')
 
     def __init__(self, sender_id, sender2_id, course_space, topic):
         self.sender_id = sender_id
@@ -37,9 +36,9 @@ class ChatModel(db.Model):
         Return all user chatModel
         """
         query = ChatModel.query\
-            .join(Messages, Messages.chat_id == ChatModel.chat_id)\
+            .join(MessageModel, MessageModel.chat_id == ChatModel.chat_id)\
             .filter((ChatModel.sender_id == user) | (ChatModel.sender2_id == user))\
-            .order_by(Messages.timestamp.desc())\
+            .order_by(MessageModel.timestamp.desc())\
             .all()
 
         return [chat.serialize(user) for chat in query]
@@ -72,7 +71,7 @@ class ChatModel(db.Model):
             db.session.rollback()
 
     def is_unread(self, user):
-        t = self.messages.filter(and_(Messages.is_read == False, Messages.sender != user)).first()
+        t = self.messages.filter(and_(MessageModel.is_read == False, MessageModel.sender != user)).first()
         if t is None:
             return False
         return True

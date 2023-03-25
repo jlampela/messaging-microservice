@@ -1,6 +1,6 @@
 from flask_restful import Resource, abort, request
 from flask_expects_json import expects_json, ValidationError
-from flask import Response
+from flask import Response, json
 
 from utils.auth import user_auth
 from models.chat import ChatModel
@@ -11,9 +11,9 @@ from utils.helper import correct_length
 
 class Chat(Resource):
 
-    id = request.headers.get('Token')
+    #id = request.headers.get('Token')
 
-    @user_auth(id)
+    #@user_auth(2)
     @expects_json(chat_get_schema)
     def get(self, chat_id):
         """
@@ -29,16 +29,17 @@ class Chat(Resource):
         """
         try:
             sender = request.json["sender"]
-            
             MessageModel.mark_as_read(chat_id, sender)
             messages = MessageModel.get_messages(chat_id)
-            return Response(status=200, response=messages)
+            if len(messages) < 1:
+                raise ServiceErrors(403, "No chats found.")
+            return Response(response=json.dumps(messages),status=200, mimetype="application/json")
         except ValidationError:
             abort(404, "JSON validation error.")
         except ServiceErrors as e:
             return e.response
 
-    @user_auth(id)
+    #@user_auth(id)
     @expects_json(chat_post_schema)
     def post(self, chat_id):
         """
@@ -55,15 +56,15 @@ class Chat(Resource):
         try:
             sender = request.json["sender"]
             message = request.json["message"]
-
-            MessageModel(chat_id, sender, correct_length(message))
-            return Response(status=200)
+            msg_link = request.json["linked_to"]
+            MessageModel(chat_id, sender, correct_length(message), msg_link)
+            return Response(status=201)
         except ServiceErrors as e:
             return e.response
 
 class ChatLists(Resource):
 
-    @user_auth(id)
+    #@user_auth(id)
     @expects_json(chatlists_get_schema)
     def get(self):
         """
@@ -82,12 +83,15 @@ class ChatLists(Resource):
         try:
             sender = request.json["sender"]
             chat_list = ChatModel.get_chats(sender)
-
-            return Response(status=200, response=chat_list)
+            if len(chat_list) < 1:
+                raise ServiceErrors(404, "No chats found.")
+            return Response(response=json.dumps(chat_list),status=200, mimetype="application/json")
+        except ValidationError:
+            abort(404, "JSON validation error.")
         except ServiceErrors as e:
             return e.response
 
-    @user_auth(id)
+    #@user_auth(id)
     @expects_json(chatlists_post_schema)
     def post(self):
         """
@@ -116,6 +120,8 @@ class ChatLists(Resource):
 
             #Now creates the message that is linked to the chat
             MessageModel(new_chat.chat_id, sender, message)
-            return Response(status=200)
+            return Response(status=201)
+        except ValidationError:
+            abort(404, "JSON validation error.")
         except ServiceErrors as e:
             return e.response

@@ -1,8 +1,6 @@
-from utils.errors import ServiceErrors
-
-from sqlalchemy import and_
+from sqlalchemy import and_, null
 from sqlalchemy.exc import IntegrityError, NoResultFound
-from api import db
+from db import db
 import datetime
 
 class MessageModel(db.Model):
@@ -10,20 +8,22 @@ class MessageModel(db.Model):
     Messages class for creating 'messages' table in the database
     which contains all the messages sent
     """
-    __tablename__ = 'Messages'
+    __tablename__ = 'messages'
 
     id = db.Column(db.Integer, primary_key=True, unique=True)
-    chat_id = db.Column(db.String(80), db.ForeignKey('Chats.chat_id'), nullable=False)
+    chat_id = db.Column(db.String(80), db.ForeignKey('chats.chat_id'), nullable=False)
     sender = db.Column(db.String(80), nullable=False)
     message = db.Column(db.String(500), nullable=False)
     is_read = db.Column(db.Boolean, default=False)
     timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    linked_to = db.Column(db.Integer, db.ForeignKey('messages.id'))
 
-    def __init__(self, chat_id, sender, message):
+    def __init__(self, chat_id, sender, message, linked_to=None):
         
         self.chat_id = chat_id
         self.sender = sender
         self.message = message
+        self.linked_to = linked_to
         self.create_message()
 
     def get_messages(chat_id):
@@ -61,5 +61,6 @@ class MessageModel(db.Model):
             'sender': self.sender,
             'message': self.message,
             'is_read': self.is_read,
-            'timestamp': self.timestamp
+            'timestamp': self.timestamp,
+            'linked_to' : self.linked_to
         }

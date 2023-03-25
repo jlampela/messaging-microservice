@@ -2,10 +2,9 @@
 chat_get_schema = {
     'type' : 'object',
     'properties' : {
-        'sender' : {'type' : 'string'},
-        'chat_id' : {'type' : 'string'}
+        'sender' : {'type' : 'string'}
     },
-    'required' : ['username', 'chat_id']
+    'required' : ['sender']
 }
 
 chat_post_schema = {
@@ -13,9 +12,9 @@ chat_post_schema = {
     'properties' : {
         'sender' : {'type' : 'string'},
         'message' : {'type' : 'string'},
-        'chat_id' : {'type' : 'string'}
+        'linked_to' : {'type' : 'string'}
     },
-    'required' : ['sender', 'message' ,'chat_id']
+    'required' : ['sender', 'message']
 }
 
 chatlists_get_schema = {
