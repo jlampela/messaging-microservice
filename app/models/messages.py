@@ -19,7 +19,6 @@ class MessageModel(db.Model):
     linked_to = db.Column(db.Integer, db.ForeignKey('messages.id'))
 
     def __init__(self, chat_id, sender, message, linked_to=None):
-        
         self.chat_id = chat_id
         self.sender = sender
         self.message = message

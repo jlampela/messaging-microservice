@@ -34,8 +34,6 @@ class Chat(Resource):
             if len(messages) < 1:
                 raise ServiceErrors(403, "No chats found.")
             return Response(response=json.dumps(messages),status=200, mimetype="application/json")
-        except ValidationError:
-            abort(404, "JSON validation error.")
         except ServiceErrors as e:
             return e.response
 
@@ -86,8 +84,6 @@ class ChatLists(Resource):
             if len(chat_list) < 1:
                 raise ServiceErrors(404, "No chats found.")
             return Response(response=json.dumps(chat_list),status=200, mimetype="application/json")
-        except ValidationError:
-            abort(404, "JSON validation error.")
         except ServiceErrors as e:
             return e.response
 
@@ -121,7 +117,5 @@ class ChatLists(Resource):
             #Now creates the message that is linked to the chat
             MessageModel(new_chat.chat_id, sender, message)
             return Response(status=201)
-        except ValidationError:
-            abort(404, "JSON validation error.")
         except ServiceErrors as e:
             return e.response

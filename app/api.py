@@ -1,5 +1,7 @@
 from flask import Flask, Blueprint
 from flask_restful import Resource, Api
+from utils.errors import bad_request
+
 
 from config import config
 
@@ -23,6 +25,8 @@ def create_db_tables():
 from resources.chat import ChatLists, Chat
 api.add_resource(ChatLists, '/chat')
 api.add_resource(Chat, '/chat/<string:chat_id>')
+
+app.register_error_handler(400, bad_request)
 
 @bp.route("/")
 def index():
