@@ -1,4 +1,6 @@
-from flask import jsonify
+from flask import jsonify, make_response
+from jsonschema import ValidationError
+
 
 class ServiceErrors(Exception):
     """
@@ -11,14 +13,8 @@ class ServiceErrors(Exception):
 
     @property
     def response(self):
-        response = jsonify({'status': self.code, 
-                            'error': self.message})
-        response.status_code = self.code
-        return response
+        return make_response(jsonify({'error' : self.message, 'code' : self.code}), self.code)
 
-
-from flask import make_response, jsonify
-from jsonschema import ValidationError
 
 def bad_request(error):
     if isinstance(error.description, ValidationError):

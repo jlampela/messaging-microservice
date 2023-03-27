@@ -1,7 +1,7 @@
 from uuid import uuid4
 from models.messages import MessageModel
 from sqlalchemy import and_
-from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlalchemy.exc import IntegrityError
 from db import db
 
 
@@ -33,7 +33,7 @@ class ChatModel(db.Model):
 
     def get_chats(user):
         """
-        Return all user chatModel
+        Return all user chats as a list
         """
         query = ChatModel.query\
             .join(MessageModel, MessageModel.chat_id == ChatModel.chat_id)\

@@ -115,7 +115,7 @@ class ChatLists(Resource):
             new_chat = ChatModel(sender, receiver, course_space, topic)
 
             #Now creates the message that is linked to the chat
-            MessageModel(new_chat.chat_id, sender, message)
+            MessageModel(new_chat.chat_id, sender, correct_length(message))
             return Response(status=201)
         except ServiceErrors as e:
             return e.response
