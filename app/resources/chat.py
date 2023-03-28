@@ -1,6 +1,6 @@
 from flask_restful import Resource, abort, request
 from flask_expects_json import expects_json, ValidationError
-from flask import Response, json
+from flask import Response, json, make_response
 
 from utils.auth import user_auth
 from models.chat import ChatModel
@@ -56,7 +56,9 @@ class Chat(Resource):
             message = request.json["message"]
             msg_link = request.json["linked_to"]
             MessageModel(chat_id, sender, correct_length(message), msg_link)
-            return Response(status=201)
+            
+            response = make_response({'message' : 'Resource created successfully'}, 201)
+            return response
         except ServiceErrors as e:
             return e.response
 
@@ -116,6 +118,10 @@ class ChatLists(Resource):
 
             #Now creates the message that is linked to the chat
             MessageModel(new_chat.chat_id, sender, correct_length(message))
-            return Response(status=201)
+
+
+            response = make_response({'message' : 'Resource created successfully'}, 201)
+            response.headers['Location'] = f"/chat/{new_chat.chat_id}"
+            return response
         except ServiceErrors as e:
             return e.response
