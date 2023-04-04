@@ -10,8 +10,8 @@ app.config.from_object(config["development"])
 
 
 api = Api(app)
-bp = Blueprint("api", __name__, url_prefix="/api")
-
+bp = Blueprint('api', __name__)
+#app.register_blueprint(bp)
     
 @app.before_first_request
 def create_db_tables():
@@ -23,14 +23,14 @@ def create_db_tables():
 
 
 from resources.chat import ChatLists, Chat
-api.add_resource(ChatLists, '/chat')
-api.add_resource(Chat, '/chat/<string:chat_id>')
+api.add_resource(ChatLists, '/chat/<string:userId>')
+api.add_resource(Chat, '/chat/<string:userId>/<string:chatId>')
 
 app.register_error_handler(400, bad_request)
 
-@bp.route("/")
-def index():
-    return {'Status' : 'OK'}
+@app.route("/")
+def index():   
+    return {'status' : 'ok'}
 
 if __name__ == '__main__':
     app.run(debug=True)
