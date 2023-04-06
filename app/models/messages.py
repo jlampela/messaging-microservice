@@ -11,8 +11,8 @@ class MessageModel(db.Model):
     __tablename__ = 'messages'
 
     id = db.Column(db.Integer, primary_key=True, unique=True)
-    chat_id = db.Column(db.String(80), db.ForeignKey('chats.chat_id'), nullable=False)
-    sender = db.Column(db.String(80), nullable=False)
+    chat_id = db.Column(db.Integer, db.ForeignKey('chats.id'), nullable=False)
+    sender = db.Column(db.String(50), nullable=False)
     message = db.Column(db.String(500), nullable=False)
     is_read = db.Column(db.Boolean, default=False)
     timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
@@ -27,9 +27,15 @@ class MessageModel(db.Model):
 
     def get_messages(chat_id):
         """
+        FIX
         Returns messages for specific chat
         """
-        query = MessageModel.query.filter_by(chat_id = chat_id).order_by(MessageModel.timestamp.desc()).all()
+        query = MessageModel.query\
+            .filter_by(chat_id == MessageModel.chat_id)\
+            .order_by(MessageModel.timestamp.desc())\
+            .all()
+        print(query)
+
         return [msg.serialize for msg in query]
     
     def create_message(self):
@@ -43,6 +49,9 @@ class MessageModel(db.Model):
             db.session.rollback()
 
     def mark_as_read(chat_id, sender):
+        """
+        Marks the message read status
+        """
         query = MessageModel.query.filter_by(chat_id = chat_id).all()
 
         for msg in query:

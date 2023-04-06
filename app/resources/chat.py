@@ -4,6 +4,7 @@ from flask import  json, make_response
 
 from models.chat import ChatModel
 from models.messages import MessageModel
+from models.participants import Participants
 from models.schema import chat_get_schema, chat_post_schema, chatlists_get_schema, chatlists_post_schema
 
 from utils.auth import user_auth
@@ -15,7 +16,7 @@ class Chat(Resource):
     #id = request.headers.get('Token')
 
     #@user_auth(2)
-    @expects_json(chat_get_schema)
+    #@expects_json(chat_get_schema)
     def get(self, userId, chatId):
         """
         Returns specific chat based on the chat id
@@ -29,8 +30,9 @@ class Chat(Resource):
 
         """
         try:
-            MessageModel.mark_as_read(chatId, userId)
-            messages = MessageModel.get_messages(chatId)
+            chat = ChatModel.
+            #MessageModel.mark_as_read(chatId, userId)
+            #messages = MessageModel.get_messages(chatId)
             if len(messages) < 1:
                 raise ServiceErrors(403, "No chats found.")
             
@@ -41,7 +43,7 @@ class Chat(Resource):
             return e.response
 
     #@user_auth(id)
-    @expects_json(chat_post_schema)
+    #@expects_json(chat_post_schema)
     def post(self, userId, chatId):
         """
         Sending message to specific chat
@@ -67,7 +69,7 @@ class Chat(Resource):
 class ChatLists(Resource):
 
     #@user_auth(id)
-    @expects_json(chatlists_get_schema)
+    #@expects_json(chatlists_get_schema)
     def get(self, userId):
         """
         Returns all chats as a list in a way that the chat with the
@@ -94,7 +96,8 @@ class ChatLists(Resource):
             return e.response
 
     #@user_auth(id)
-    @expects_json(chatlists_post_schema)
+    #fixaa schemat
+    #@expects_json(chatlists_post_schema)
     def post(self, userId):
         """
         Creates a new chat 1-on-1 with a user or a group chat
@@ -111,19 +114,40 @@ class ChatLists(Resource):
 
         """
         try:
+            chat_id = None
+
             receiver = request.json["receiver"]
             course_space = request.json["course_space"]
             topic = request.json["topic"]
             message = request.json["message"]
 
-            #Creates the chat
-            new_chat = ChatModel(userId, receiver, course_space, topic)
+            if isinstance(receiver, list):
+                #Creates group chat
+                group_chat = ChatModel(course_space, topic, "Group")
+                
+                #Add the sender
+                Participants(group_chat.id, userId)
+                #Add participants to db
+                for participant in receiver:
+                    Participants(group_chat.id, participant)
 
-            #Now creates the message that is linked to the chat
-            MessageModel(new_chat.chat_id, userId, correct_length(message))
+                #Now creates the message that is linked to the chat
+                MessageModel(group_chat.id, userId, correct_length(message))
+                chat_id = group_chat.chat_id
+            else:
+                #Creates private chat
+                private_chat = ChatModel(course_space, topic, "Private")
+
+                #Add participants to db
+                sender = Participants(private_chat.id, userId)
+                receiver = Participants(private_chat.id, receiver)
+
+                #Now creates the message that is linked to the chat
+                MessageModel(private_chat.id, userId, correct_length(message))
+                chat_id = private_chat.chat_id
 
             response = make_response({'message' : 'Resource created successfully'}, 201)
-            response.headers['Location'] = f"/chat/{new_chat.chat_id}"
+            response.headers['Location'] = f"/chat/{chat_id}"
             return response
         except ServiceErrors as e:
             return e.response
