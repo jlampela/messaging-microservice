@@ -30,9 +30,9 @@ class Chat(Resource):
 
         """
         try:
-            chat = ChatModel.
-            #MessageModel.mark_as_read(chatId, userId)
-            #messages = MessageModel.get_messages(chatId)
+            id = ChatModel.get_id(chatId)
+            MessageModel.mark_as_read(id, userId)
+            messages = MessageModel.get_messages(id)
             if len(messages) < 1:
                 raise ServiceErrors(403, "No chats found.")
             
@@ -57,9 +57,10 @@ class Chat(Resource):
 
         """
         try:
+            id = ChatModel.get_id(chatId)
             message = request.json["message"]
             msg_link = request.json["linked_to"]
-            MessageModel(chatId, userId, correct_length(message), msg_link)
+            MessageModel(id, userId, correct_length(message), msg_link)
 
             response = make_response({'message' : 'Resource created successfully'}, 201)
             return response
@@ -96,7 +97,6 @@ class ChatLists(Resource):
             return e.response
 
     #@user_auth(id)
-    #fixaa schemat
     #@expects_json(chatlists_post_schema)
     def post(self, userId):
         """
@@ -140,7 +140,7 @@ class ChatLists(Resource):
 
                 #Add participants to db
                 sender = Participants(private_chat.id, userId)
-                receiver = Participants(private_chat.id, receiver)
+                receive = Participants(private_chat.id, receiver)
 
                 #Now creates the message that is linked to the chat
                 MessageModel(private_chat.id, userId, correct_length(message))

@@ -1,7 +1,8 @@
 from sqlalchemy import and_, null
-from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlalchemy.exc import IntegrityError
 from db import db
 import datetime
+
 
 class MessageModel(db.Model):
     """
@@ -27,16 +28,14 @@ class MessageModel(db.Model):
 
     def get_messages(chat_id):
         """
-        FIX
         Returns messages for specific chat
         """
         query = MessageModel.query\
-            .filter_by(chat_id == MessageModel.chat_id)\
+            .filter(chat_id == MessageModel.chat_id)\
             .order_by(MessageModel.timestamp.desc())\
             .all()
-        print(query)
 
-        return [msg.serialize for msg in query]
+        return {'messages' : [msg.serialize for msg in query]}
     
     def create_message(self):
         """

@@ -27,10 +27,10 @@ class ChatModel(db.Model):
         self.course_space = course_space
         self.topic = topic
         self.type = type
-        self.chat_id = uuid4()
+        self.chat_id = self._generate_chat_id()
         self.create_chat()
 
-        #fixaa
+        #Tällä hetkellä voi lähettää identtisiä chatteja
         #self.chat_id = self._get_chat_id()
         #Creates new chat if not already created
         #if self.chat_id == False:
@@ -39,15 +39,8 @@ class ChatModel(db.Model):
 
     def get_chats(userId):
         """
-        FIX
         Return all user chats as a list
         """
-        #query = ChatModel.query\
-        #    .join(MessageModel, MessageModel.chat_id == ChatModel.chat_id)\
-        #    .filter((ChatModel.sender_id == user) | (ChatModel.sender2_id == user))\
-        #    .order_by(MessageModel.timestamp.desc())\
-        #    .all()
-
         query = ChatModel.query\
             .join(Participants)\
             .join(MessageModel, ChatModel.id == MessageModel.chat_id)\
@@ -60,19 +53,24 @@ class ChatModel(db.Model):
     
     def _get_chat_id(self):
         """
-        FIX
         Query for chats that have been already created
+
+        not working currently
         """
 
         chat_id = False
-    
-        query = ChatModel.query.filter((ChatModel.sender_id == self.sender_id) & (ChatModel.sender2_id == self.sender2_id)
-                            | (ChatModel.sender_id == self.sender2_id) & (ChatModel.sender2_id == self.sender_id)).all()
+
+        #query = ChatModel.query.filter((ChatModel.sender_id == self.sender_id) & (ChatModel.sender2_id == self.sender2_id)
+        #                    | (ChatModel.sender_id == self.sender2_id) & (ChatModel.sender2_id == self.sender_id)).all()
         
-        if len(query) > 0:
-            for chat in query:
-                chat_id = chat.chat_id
-        return chat_id
+        #query = ChatModel.query\
+        #    .join(Participants)\
+        #    .filter(Participants.userId.in_())
+
+        #if len(query) > 0:
+        #    for chat in query:
+        #        chat_id = chat.chat_id
+        #return chat_id
     
     def _generate_chat_id(self):
         """
@@ -82,6 +80,7 @@ class ChatModel(db.Model):
         while True:
             chat_id = uuid4()
             if chat_id not in all_chatModel:
+                print(chat_id)
                 return chat_id
     
     def create_chat(self):
@@ -96,17 +95,20 @@ class ChatModel(db.Model):
 
     def is_unread(self, user):
         """
-        FIX
         Checks for unread messages
         """
         t = self.messages.filter(and_(MessageModel.is_read == False, MessageModel.sender != user)).first()
         if t is None:
             return False
         return True
+    
+    def get_id(chat_id):
+
+        q = ChatModel.query.filter(ChatModel.chat_id == chat_id).first()
+        return q.id
 
     def serialize(self, user):
         """
-        FIX
         Return object data in serializeable format
         """
 
