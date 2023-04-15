@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint
+from flask import Flask, Blueprint, render_template
 from flask_restful import Resource, Api
 from utils.errors import bad_request
 
@@ -23,14 +23,14 @@ def create_db_tables():
 
 
 from resources.chat import ChatLists, Chat
-api.add_resource(ChatLists, '/chat/<string:userId>')
-api.add_resource(Chat, '/chat/<string:userId>/<string:chatId>')
+api.add_resource(ChatLists, '/chats/<string:userId>')
+api.add_resource(Chat, '/chat/<string:chatId>')
 
 app.register_error_handler(400, bad_request)
 
 @app.route("/")
 def index():   
-    return {'status' : 'ok'}
+    return render_template("index.html")
 
 if __name__ == '__main__':
     app.run(debug=True)

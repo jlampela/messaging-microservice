@@ -43,8 +43,8 @@ class Chat(Resource):
             return e.response
 
     #@user_auth(id)
-    #@expects_json(chat_post_schema)
-    def post(self, userId, chatId):
+    @expects_json(chat_post_schema)
+    def post(self,chatId):
         """
         Sending message to specific chat
 
@@ -58,6 +58,7 @@ class Chat(Resource):
         """
         try:
             id = ChatModel.get_id(chatId)
+            userId = request.json["userId"]
             message = request.json["message"]
             msg_link = request.json["linked_to"]
             MessageModel(id, userId, correct_length(message), msg_link)
@@ -79,7 +80,7 @@ class ChatLists(Resource):
 
         Args:
             Token : Token for authorization
-            Sender (str) : text inside the request body
+            user_id : Id from URL
 
         Returns:
             All the chats in JSON
@@ -97,13 +98,13 @@ class ChatLists(Resource):
             return e.response
 
     #@user_auth(id)
-    #@expects_json(chatlists_post_schema)
+    @expects_json(chatlists_post_schema)
     def post(self, userId):
         """
         Creates a new chat 1-on-1 with a user or a group chat
 
         Args:
-            Sender (str) : text inside the request body
+            userId (str) : text inside the url
             Receiver (str) : text inside the request body
             Course_space (str) : text inside the request body
             Topic (str) : text inside the request body

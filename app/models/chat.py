@@ -80,7 +80,6 @@ class ChatModel(db.Model):
         while True:
             chat_id = uuid4()
             if chat_id not in all_chatModel:
-                print(chat_id)
                 return chat_id
     
     def create_chat(self):

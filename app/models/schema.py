@@ -10,11 +10,11 @@ chat_get_schema = {
 chat_post_schema = {
     'type' : 'object',
     'properties' : {
-        'sender' : {'type' : 'string'},
+        'userId' : {'type' : 'string'},
         'message' : {'type' : 'string'},
         'linked_to' : {'type' : 'string'}
     },
-    'required' : ['sender', 'message']
+    'required' : ['userId', 'message']
 }
 
 chatlists_get_schema = {
@@ -28,11 +28,10 @@ chatlists_get_schema = {
 chatlists_post_schema = {
     'type' : 'object',
     'properties' : {
-        'sender' : {'type' : 'string'},
         'receiver' : {'type' : 'string'},
         'course_space' : {'type' : 'string'},
         'topic' : {'type' : 'string'},
         'message' : {'type' : 'string'},
     },
-    'required' : ['sender', 'receiver', 'course_space', 'topic', 'message',]
+    'required' : ['receiver', 'course_space', 'topic', 'message',]
 }
