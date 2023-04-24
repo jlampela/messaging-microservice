@@ -28,7 +28,7 @@ chatlists_get_schema = {
 chatlists_post_schema = {
     'type' : 'object',
     'properties' : {
-        'receiver' : {'type' : 'string'},
+        'receiver' : {'type' : ['string', 'array']},
         'course_space' : {'type' : 'string'},
         'topic' : {'type' : 'string'},
         'message' : {'type' : 'string'},

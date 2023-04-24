@@ -1,4 +1,4 @@
-from utils.errors import ServiceErrors
+from app.utils.errors import ServiceErrors
 
 
 def correct_length(string):

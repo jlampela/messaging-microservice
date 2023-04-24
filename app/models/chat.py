@@ -1,11 +1,11 @@
 from uuid import uuid4
 
-from models.messages import MessageModel
-from models.participants import Participants
+from app.models.messages import MessageModel
+from app.models.participants import Participants
 
 from sqlalchemy import and_
 from sqlalchemy.exc import IntegrityError
-from db import db
+from app import db
 
 
 class ChatModel(db.Model):
@@ -20,6 +20,7 @@ class ChatModel(db.Model):
     topic = db.Column(db.String(80), nullable=False)
     course_space = db.Column(db.String(80))
     type = db.Column(db.String(50))
+    #language = db.Column(db.String(5))
     messages = db.relationship('MessageModel', backref='chats', lazy='dynamic', order_by='MessageModel.timestamp')
     participants = db.relationship('Participants', lazy='dynamic')
 

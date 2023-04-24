@@ -2,14 +2,14 @@ from flask_restful import Resource, request
 from flask_expects_json import expects_json
 from flask import  json, make_response
 
-from models.chat import ChatModel
-from models.messages import MessageModel
-from models.participants import Participants
-from models.schema import chat_get_schema, chat_post_schema, chatlists_get_schema, chatlists_post_schema
+from app.models.chat import ChatModel
+from app.models.messages import MessageModel
+from app.models.participants import Participants
+from app.models.schema import chat_get_schema, chat_post_schema, chatlists_get_schema, chatlists_post_schema
 
-from utils.auth import user_auth
-from utils.errors import ServiceErrors
-from utils.helper import correct_length
+from app.utils.auth import user_auth
+from app.utils.errors import ServiceErrors
+from app.utils.helper import correct_length
 
 class Chat(Resource):
 
@@ -17,20 +17,21 @@ class Chat(Resource):
 
     #@user_auth(2)
     #@expects_json(chat_get_schema)
-    def get(self, userId, chatId):
+    def get(self, chatId):
         """
         Returns specific chat based on the chat id
 
         Args:
             Token : Token for authorization
             chat_id : In the routing url      
-
+            userId (str) : text inside the request body 
         Returns:
             Messages : JSON list  
 
         """
         try:
             id = ChatModel.get_id(chatId)
+            userId = request.json["userId"]
             MessageModel.mark_as_read(id, userId)
             messages = MessageModel.get_messages(id)
             if len(messages) < 1:
@@ -52,6 +53,7 @@ class Chat(Resource):
             Token : Token for authorization
             chat_id : In the routing url      
             message (str) : text inside the request body
+            msg_link (str) : Optional
         Returns:
             Status 
 
@@ -105,7 +107,7 @@ class ChatLists(Resource):
 
         Args:
             userId (str) : text inside the url
-            Receiver (str) : text inside the request body
+            Receiver (str) OR (list) : text inside the request body
             Course_space (str) : text inside the request body
             Topic (str) : text inside the request body
             Message (str) : text inside the request body        
