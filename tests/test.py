@@ -17,8 +17,11 @@ class Tests(unittest.TestCase):
                             })
         
         a = self.client.get("/chats/test1")
+        b = a.get_json()
+        assert b[0]["type"] == "Private"
 
-        print(a.get_json())
+
+        #print(a.get_json())
         assert a.status_code == 200
 
     #needs to be group
@@ -31,8 +34,10 @@ class Tests(unittest.TestCase):
                             })
         
         b = self.client.get("/chats/test2")
+        c = b.get_json()
+        assert c[0]["type"] == "Group"
 
-        print(b.get_json())
+        #print(b.get_json())
         assert b.status_code == 200
 
 
