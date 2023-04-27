@@ -32,6 +32,7 @@ chatlists_post_schema = {
         'course_space' : {'type' : 'string'},
         'topic' : {'type' : 'string'},
         'message' : {'type' : 'string'},
+        'language' : {'type' : 'string'}
     },
-    'required' : ['receiver', 'course_space', 'topic', 'message',]
+    'required' : ['receiver', 'course_space', 'topic', 'message','language']
 }
