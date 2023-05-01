@@ -1,6 +1,7 @@
 from flask_restful import Resource, request
 from flask_expects_json import expects_json
 from flask import  json, make_response
+from app import limiter
 
 from app.models.chat import ChatModel
 from app.models.messages import MessageModel
@@ -13,9 +14,9 @@ from app.utils.helper import correct_length
 
 class Chat(Resource):
 
-    #id = request.headers.get('Token')
+    #Here add token authentication too
+    decorators = [limiter.limit("30/minute")]
 
-    #@user_auth(2)
     #@expects_json(chat_get_schema)
     def get(self, chatId):
         """
@@ -43,7 +44,6 @@ class Chat(Resource):
         except ServiceErrors as e:
             return e.response
 
-    #@user_auth(id)
     @expects_json(chat_post_schema)
     def post(self,chatId):
         """
@@ -72,7 +72,8 @@ class Chat(Resource):
 
 class ChatLists(Resource):
 
-    #@user_auth(id)
+    decorators = [limiter.limit("30/minute")]
+
     #@expects_json(chatlists_get_schema)
     def get(self, userId):
         """
@@ -99,7 +100,6 @@ class ChatLists(Resource):
         except ServiceErrors as e:
             return e.response
 
-    #@user_auth(id)
     @expects_json(chatlists_post_schema)
     def post(self, userId):
         """
@@ -123,10 +123,11 @@ class ChatLists(Resource):
             course_space = request.json["course_space"]
             topic = request.json["topic"]
             message = request.json["message"]
+            language = request.json("language")
 
             if isinstance(receiver, list):
                 #Creates group chat
-                group_chat = ChatModel(course_space, topic, "Group")
+                group_chat = ChatModel(course_space, topic, "Group", language)
                 
                 #Add the sender
                 Participants(group_chat.id, userId)
@@ -139,7 +140,7 @@ class ChatLists(Resource):
                 chat_id = group_chat.chat_id
             else:
                 #Creates private chat
-                private_chat = ChatModel(course_space, topic, "Private")
+                private_chat = ChatModel(course_space, topic, "Private", language)
 
                 #Add participants to db
                 sender = Participants(private_chat.id, userId)

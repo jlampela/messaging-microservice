@@ -20,14 +20,15 @@ class ChatModel(db.Model):
     topic = db.Column(db.String(80), nullable=False)
     course_space = db.Column(db.String(80))
     type = db.Column(db.String(50))
-    #language = db.Column(db.String(5))
+    language = db.Column(db.String(5))
     messages = db.relationship('MessageModel', backref='chats', lazy='dynamic', order_by='MessageModel.timestamp')
     participants = db.relationship('Participants', lazy='dynamic')
 
-    def __init__(self, course_space, topic, type):
+    def __init__(self, course_space, topic, type, language):
         self.course_space = course_space
         self.topic = topic
         self.type = type
+        self.language = language
         self.chat_id = self._generate_chat_id()
         self.create_chat()
 
@@ -118,5 +119,6 @@ class ChatModel(db.Model):
             'topic': self.topic,
             'course_space' : self.course_space,
             'type' : self.type,
+            'language' : self.language,
             'unread_msg': self.is_unread(user)
         }
