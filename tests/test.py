@@ -46,15 +46,17 @@ class Tests(unittest.TestCase):
         assert b.status_code == 200
 
     def test_wrong_requirement(self):
-        a = self.client.post("/chats/test3", json={
+        self.client.post("/chats/test3", json={
                             "vastaanottaja" : "name",
                             "course_space" : "ohj1",
                             "topic" : "afdsas",
                             "message" : "JEE",
                             "language": "fi"
                             })
+        
+        b = self.client.get("/chats/test3")
             
-        test = a.get_json()
+        test = b.get_json()
         print(test)
 
         #print(a.get_json())
@@ -91,11 +93,14 @@ class Tests(unittest.TestCase):
                 "message" : "link test",
 
             })
-            
+
+            testlink1 = self.client.get("/chats/linktest")
+            testlink2 = testlink1.get_json() 
+
             self.client.post("/chats/linktest", json={
                 "userId" : "2",
                 "message:" : "link test",
-                "linked_to" : "1"
+                "linked_to" : testlink2
             })
 
         except:
