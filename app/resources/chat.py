@@ -2,7 +2,7 @@ from flask_restful import Resource, request
 from flask_expects_json import expects_json
 from flask import  json, make_response
 #from app import limiter
-from app import babel
+#from app import babel
 
 from app.models.chat import ChatModel
 from app.models.messages import MessageModel
