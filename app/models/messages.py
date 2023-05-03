@@ -52,6 +52,8 @@ class MessageModel(db.Model):
         Marks the message read status
         """
         query = MessageModel.query.filter_by(chat_id = chat_id).all()
+        if len(query < 1):
+            return False
 
         for msg in query:
             if msg.sender != sender and msg.is_read == False:

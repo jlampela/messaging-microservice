@@ -20,7 +20,7 @@ class ChatModel(db.Model):
     topic = db.Column(db.String(80), nullable=False)
     course_space = db.Column(db.String(80))
     type = db.Column(db.String(50))
-    language = db.Column(db.String(5))
+    language = db.Column(db.String(2))
     messages = db.relationship('MessageModel', backref='chats', lazy='dynamic', order_by='MessageModel.timestamp')
     participants = db.relationship('Participants', lazy='dynamic')
 

@@ -1,7 +1,8 @@
 from flask_restful import Resource, request
 from flask_expects_json import expects_json
 from flask import  json, make_response
-from app import limiter
+#from app import limiter
+from app import babel
 
 from app.models.chat import ChatModel
 from app.models.messages import MessageModel
@@ -15,7 +16,7 @@ from app.utils.helper import correct_length
 class Chat(Resource):
 
     #Here add token authentication too
-    decorators = [limiter.limit("30/minute")]
+    #decorators = [limiter.limit("30/minute")]
 
     #@expects_json(chat_get_schema)
     def get(self, chatId):
@@ -26,17 +27,20 @@ class Chat(Resource):
             Token : Token for authorization
             chat_id : In the routing url      
             userId (str) : text inside the request body 
+            language : 'fi' or 'en'
         Returns:
             Messages : JSON list  
 
         """
         try:
             id = ChatModel.get_id(chatId)
-            userId = request.json["userId"]
-            MessageModel.mark_as_read(id, userId)
+
+            language = request.json['language']
+            #babel.locale_selector = language
+
             messages = MessageModel.get_messages(id)
             if len(messages) < 1:
-                raise ServiceErrors(403, "No chats found.")
+                raise ServiceErrors(404, "No chats found.")
             
             response = make_response(json.dumps(messages), 200)
             response.mimetype = "application/json"
@@ -54,6 +58,7 @@ class Chat(Resource):
             chat_id : In the routing url      
             message (str) : text inside the request body
             msg_link (str) : Optional
+            language : 'fi' or 'en'
         Returns:
             Status 
 
@@ -63,16 +68,41 @@ class Chat(Resource):
             userId = request.json["userId"]
             message = request.json["message"]
             msg_link = request.json["linked_to"]
+            language = request.json['language']
             MessageModel(id, userId, correct_length(message), msg_link)
 
-            response = make_response({'message' : 'Resource created successfully'}, 201)
+            response = make_response({'message' : 'Resource created successfully.'}, 201)
+            return response
+        except ServiceErrors as e:
+            return e.response
+        
+    def put(self, chatId):
+        """
+        Marking messages as read
+
+        Args:
+            Token : Token for authorization
+            chatId : In the routing url
+            UserId : Text inside the request body
+        Returns:
+            Status
+        """
+        try:
+            id = ChatModel.get_id(chatId)
+            userId = request.json["userId"]
+            a = MessageModel.mark_as_read(id, userId)
+            if a is False:
+                raise ServiceErrors(404, "No messages found.")
+            
+            response = make_response({'message' : 'Resource updated successfully.'}, 200)
             return response
         except ServiceErrors as e:
             return e.response
 
+
 class ChatLists(Resource):
 
-    decorators = [limiter.limit("30/minute")]
+    #decorators = [limiter.limit("30/minute")]
 
     #@expects_json(chatlists_get_schema)
     def get(self, userId):
@@ -84,13 +114,15 @@ class ChatLists(Resource):
         Args:
             Token : Token for authorization
             user_id : Id from URL
-
+            language : 'fi' or 'en'
         Returns:
             All the chats in JSON
 
         """
         try:
             chat_list = ChatModel.get_chats(userId)
+            language = request.json['language']
+            
             if len(chat_list) < 1:
                 raise ServiceErrors(404, "No chats found.")
 
@@ -111,7 +143,7 @@ class ChatLists(Resource):
             Course_space (str) : text inside the request body
             Topic (str) : text inside the request body
             Message (str) : text inside the request body        
-
+            language : 'fi' or 'en'
         Returns:
             Status (Key-Value pair) : text in JSON    
 
@@ -123,7 +155,7 @@ class ChatLists(Resource):
             course_space = request.json["course_space"]
             topic = request.json["topic"]
             message = request.json["message"]
-            language = request.json("language")
+            language = request.json['language']
 
             if isinstance(receiver, list):
                 #Creates group chat
@@ -150,7 +182,7 @@ class ChatLists(Resource):
                 MessageModel(private_chat.id, userId, correct_length(message))
                 chat_id = private_chat.chat_id
 
-            response = make_response({'message' : 'Resource created successfully'}, 201)
+            response = make_response({'message' : 'Resource created successfully.'}, 201)
             response.headers['Location'] = f"/chat/{chat_id}"
             return response
         except ServiceErrors as e:
