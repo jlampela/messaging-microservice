@@ -19,14 +19,14 @@ class Chat(Resource):
     #decorators = [limiter.limit("30/minute")]
 
     #@expects_json(chat_get_schema)
-    def get(self, chatId):
+    def get(self, userId, chatId):
         """
         Returns specific chat based on the chat id
 
         Args:
             Token : Token for authorization
+            userId : In the routing url
             chat_id : In the routing url      
-            userId (str) : text inside the request body 
             language : 'fi' or 'en'
         Returns:
             Messages : JSON list  
@@ -49,7 +49,7 @@ class Chat(Resource):
             return e.response
 
     @expects_json(chat_post_schema)
-    def post(self,chatId):
+    def post(self, userId, chatId):
         """
         Sending message to specific chat
 
@@ -65,7 +65,6 @@ class Chat(Resource):
         """
         try:
             id = ChatModel.get_id(chatId)
-            userId = request.json["userId"]
             message = request.json["message"]
             msg_link = request.json["linked_to"]
             language = request.json['language']
@@ -76,7 +75,7 @@ class Chat(Resource):
         except ServiceErrors as e:
             return e.response
         
-    def put(self, chatId):
+    def put(self,userId, chatId):
         """
         Marking messages as read
 
@@ -89,7 +88,6 @@ class Chat(Resource):
         """
         try:
             id = ChatModel.get_id(chatId)
-            userId = request.json["userId"]
             a = MessageModel.mark_as_read(id, userId)
             if a is False:
                 raise ServiceErrors(404, "No messages found.")

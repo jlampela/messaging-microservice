@@ -34,8 +34,8 @@ def create_app(configName = 'development'):
     db.init_app(app)
 
     from app.resources.chat import ChatLists, Chat
-    api.add_resource(ChatLists, '/chats/<string:userId>')
-    api.add_resource(Chat, '/chat/<string:chatId>')
+    api.add_resource(ChatLists, '/api/chat/<string:userId>')
+    api.add_resource(Chat, '/api/chat/<string:userId>/<string:chatId>')
 
     app.register_error_handler(400, bad_request)
 
