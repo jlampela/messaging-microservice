@@ -18,7 +18,7 @@ class Chat(Resource):
     #Here add token authentication too
     #decorators = [limiter.limit("30/minute")]
 
-    #@expects_json(chat_get_schema)
+    @expects_json(chat_get_schema)
     def get(self, userId, chatId):
         """
         Returns specific chat based on the chat id
@@ -103,7 +103,7 @@ class ChatLists(Resource):
 
     #decorators = [limiter.limit("30/minute")]
 
-    #@expects_json(chatlists_get_schema)
+    @expects_json(chatlists_get_schema)
     def get(self, userId):
         """
         Returns all chats as a list in a way that the chat with the
