@@ -2,7 +2,6 @@
 chat_get_schema = {
     'type' : 'object',
     'properties' : {
-        'sender' : {'type' : 'string'},
         'language' : {'type' : 'string'}
     },
     'required' : ['sender', 'language']
@@ -11,21 +10,19 @@ chat_get_schema = {
 chat_post_schema = {
     'type' : 'object',
     'properties' : {
-        'userId' : {'type' : 'string'},
         'message' : {'type' : 'string'},
         'linked_to' : {'type' : 'string'},
         'language' : {'type' : 'string'}
     },
-    'required' : ['userId', 'message', 'language']
+    'required' : ['message', 'language']
 }
 
 chatlists_get_schema = {
     'type' : 'object',
     'properties' : {
-        'sender' : {'type' : 'string'},
         'language' : {'type' : 'string'}
     },
-    'required' : ['sender', 'language']
+    'required' : ['language']
 }
 
 chatlists_post_schema = {
@@ -39,3 +36,4 @@ chatlists_post_schema = {
     },
     'required' : ['receiver', 'course_space', 'topic', 'message', 'language']
 }
+

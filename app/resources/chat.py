@@ -39,7 +39,7 @@ class Chat(Resource):
             #babel.locale_selector = language
 
             messages = MessageModel.get_messages(id)
-            if len(messages) < 1:
+            if len(messages.get("messages")) < 1:
                 raise ServiceErrors(404, "No chats found.")
             
             response = make_response(json.dumps(messages), 200)
@@ -67,6 +67,7 @@ class Chat(Resource):
             id = ChatModel.get_id(chatId)
             message = request.json["message"]
             msg_link = request.json["linked_to"]
+
             language = request.json['language']
             MessageModel(id, userId, correct_length(message), msg_link)
 
